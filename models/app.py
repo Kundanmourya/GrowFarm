@@ -432,8 +432,13 @@ def Crop_Disease_Prediction():
     file_up = st.file_uploader("Upload a Photo",type=['png','jpg','jpeg'])
     if file_up is None:    
         return
-    print(file_up)
-    image = Image.open(file_up)
+    # print(file_up)
+    # image = Image.open(file_up)
+    try:
+        image = Image.open(file_up)
+    except:
+        st.error('Invalid image file. Please upload a valid image file.')
+        return
     
     if st.button("Predict"):
         slot = st.empty()
