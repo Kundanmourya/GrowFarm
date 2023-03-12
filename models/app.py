@@ -369,6 +369,7 @@ def predict_image(img, model):
         with highest probability"""
     # Convert to a batch of 1
     xb = to_device(img.unsqueeze(0), device)
+    print('xb shape: ', xb.shape)
     # Get predictions from model
     yb = model(xb)
     # Pick index with highest probability
@@ -412,8 +413,13 @@ def predict_image(img, model):
          'Tomato___Tomato_Yellow_Leaf_Curl_Virus',
          'Tomato___Tomato_mosaic_virus',
          'Tomato___healthy'
+         'image_not_found'
       ]
-
+    
+    if labels[preds[0].item()] == 'image_not_found':
+        # raise ValueError('Image not found in model')
+        return 'image not found'
+    
     return labels[preds[0].item()]
 
 device = get_default_device()
@@ -439,6 +445,11 @@ def Crop_Disease_Prediction():
     except:
         st.error('Invalid image file. Please upload a valid image file.')
         return
+    else:
+        if image.mode != 'RGB':
+            # st.error('Sorry, the uploaded image cannot be processed for prediction.')
+            # return
+            prediction = 'image_not_found'
     
     if st.button("Predict"):
         slot = st.empty()
@@ -448,13 +459,24 @@ def Crop_Disease_Prediction():
         st.image(image, caption="Input Image", width = 300)
         image = transform(image)
         loaded_model = torch.load('models/plantdisease.pth')
-        prediction = predict_image(image,loaded_model)
+        # prediction = predict_image(image,loaded_model)
+        
+        try:
+            prediction = predict_image(image, loaded_model)
+        except ValueError:
+            # slot.empty()
+            st.error('Image not found in model. Please upload a valid image.')
+            return
+        if prediction == 'image_not_found':
+            st.error('Invalid')
+            return
+
         slot.empty()
         st.write(
             """
             """)
         prediction = disease_dic[prediction]
-        st.markdown("<div style='text-align:centre; overflow:hidden;'><p>Prediction: {}</p></div>".format(prediction), unsafe_allow_html=True)           
+        st.markdown("<div style='text-align:center; overflow:hidden;'>Prediction: {}".format(prediction), unsafe_allow_html=True)           
 
             
 
