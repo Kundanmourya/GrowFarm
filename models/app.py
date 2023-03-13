@@ -368,59 +368,62 @@ def predict_image(img, model):
     """Converts image to array and return the predicted class
         with highest probability"""
     # Convert to a batch of 1
-    xb = to_device(img.unsqueeze(0), device)
-    print('xb shape: ', xb.shape)
-    # Get predictions from model
-    yb = model(xb)
-    # Pick index with highest probability
-    _, preds  = torch.max(yb, dim=1)
-    # Retrieve the class label
-    labels = ['Apple___Apple_scab',
-         'Apple___Black_rot',
-         'Apple___Cedar_apple_rust',
-         'Apple___healthy',
-         'Blueberry___healthy',
-         'Cherry_(including_sour)___Powdery_mildew',
-         'Cherry_(including_sour)___healthy',
-         'Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot',
-         'Corn_(maize)___Common_rust_',
-         'Corn_(maize)___Northern_Leaf_Blight',
-         'Corn_(maize)___healthy',
-         'Grape___Black_rot',
-         'Grape___Esca_(Black_Measles)',
-         'Grape___Leaf_blight_(Isariopsis_Leaf_Spot)',
-         'Grape___healthy',
-         'Orange___Haunglongbing_(Citrus_greening)',
-         'Peach___Bacterial_spot',
-         'Peach___healthy',
-         'Pepper,_bell___Bacterial_spot',
-         'Pepper,_bell___healthy',
-         'Potato___Early_blight',
-         'Potato___Late_blight',
-         'Potato___healthy',
-         'Raspberry___healthy',
-         'Soybean___healthy',
-         'Squash___Powdery_mildew',
-         'Strawberry___Leaf_scorch',
-         'Strawberry___healthy',
-         'Tomato___Bacterial_spot',
-         'Tomato___Early_blight',
-         'Tomato___Late_blight',
-         'Tomato___Leaf_Mold',
-         'Tomato___Septoria_leaf_spot',
-         'Tomato___Spider_mites Two-spotted_spider_mite',
-         'Tomato___Target_Spot',
-         'Tomato___Tomato_Yellow_Leaf_Curl_Virus',
-         'Tomato___Tomato_mosaic_virus',
-         'Tomato___healthy'
-         'image_not_found'
-      ]
+    try:
+        xb = to_device(img.unsqueeze(0), device)
+        print('xb shape: ', xb.shape)
+        # Get predictions from model
+        yb = model(xb)
+        # Pick index with highest probability
+        _, preds  = torch.max(yb, dim=1)
+        # Retrieve the class label
+        labels = ['Apple___Apple_scab',
+            'Apple___Black_rot',
+            'Apple___Cedar_apple_rust',
+            'Apple___healthy',
+            'Blueberry___healthy',
+            'Cherry_(including_sour)___Powdery_mildew',
+            'Cherry_(including_sour)___healthy',
+            'Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot',
+            'Corn_(maize)___Common_rust_',
+            'Corn_(maize)___Northern_Leaf_Blight',
+            'Corn_(maize)___healthy',
+            'Grape___Black_rot',
+            'Grape___Esca_(Black_Measles)',
+            'Grape___Leaf_blight_(Isariopsis_Leaf_Spot)',
+            'Grape___healthy',
+            'Orange___Haunglongbing_(Citrus_greening)',
+            'Peach___Bacterial_spot',
+            'Peach___healthy',
+            'Pepper,_bell___Bacterial_spot',
+            'Pepper,_bell___healthy',
+            'Potato___Early_blight',
+            'Potato___Late_blight',
+            'Potato___healthy',
+            'Raspberry___healthy',
+            'Soybean___healthy',
+            'Squash___Powdery_mildew',
+            'Strawberry___Leaf_scorch',
+            'Strawberry___healthy',
+            'Tomato___Bacterial_spot',
+            'Tomato___Early_blight',
+            'Tomato___Late_blight',
+            'Tomato___Leaf_Mold',
+            'Tomato___Septoria_leaf_spot',
+            'Tomato___Spider_mites Two-spotted_spider_mite',
+            'Tomato___Target_Spot',
+            'Tomato___Tomato_Yellow_Leaf_Curl_Virus',
+            'Tomato___Tomato_mosaic_virus',
+            'Tomato___healthy',
+            'image___not_found'
+        ]
+        
+        if labels[preds[0].item()] == 'image___not_found':
+            return 'image not found'
+        
+        return labels[preds[0].item()]
     
-    if labels[preds[0].item()] == 'image_not_found':
-        # raise ValueError('Image not found in model')
+    except:
         return 'image not found'
-    
-    return labels[preds[0].item()]
 
 device = get_default_device()
 
@@ -438,18 +441,8 @@ def Crop_Disease_Prediction():
     file_up = st.file_uploader("Upload a Photo",type=['png','jpg','jpeg'])
     if file_up is None:    
         return
-    # print(file_up)
-    # image = Image.open(file_up)
-    try:
-        image = Image.open(file_up)
-    except:
-        st.error('Invalid image file. Please upload a valid image file.')
-        return
-    else:
-        if image.mode != 'RGB':
-            # st.error('Sorry, the uploaded image cannot be processed for prediction.')
-            # return
-            prediction = 'image_not_found'
+    print(file_up)
+    image = Image.open(file_up)
     
     if st.button("Predict"):
         slot = st.empty()
@@ -467,8 +460,11 @@ def Crop_Disease_Prediction():
             # slot.empty()
             st.error('Image not found in model. Please upload a valid image.')
             return
-        if prediction == 'image_not_found':
-            st.error('Invalid')
+        if prediction == 'image not found':
+            # st.error('Invalid')
+            # return
+            slot.empty()
+            st.error('The uploaded image was not found in the model. Please upload a different image.')
             return
 
         slot.empty()
