@@ -1,2 +1,6 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+D:/Disease_data filter=lfs diff=lfs merge=lfs -text
+D:/Disease_data filter=lfs diff=lfs merge=lfs -text
+D:/Disease_data filter=lfs diff=lfs merge=lfs -text
+D://Disease_data filter=lfs diff=lfs merge=lfs -text
